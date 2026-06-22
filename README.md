@@ -24,9 +24,36 @@ operacao-banco-blindado/
 │   ├── backup.sh               → Script de backup automático
 │   └── restore.sh              → Script de restauro
 ├── clientes.csv                → Dados brutos de clientes para importação
+├── explain_analyze_demo.sql    → Demonstração de análise de performance
 ├── docker-compose.yml          → Ambiente local com PostgreSQL 16
 └── README.md
 ```
+
+---
+
+## EXPLAIN ANALYZE — Análise de Performance
+
+O `EXPLAIN ANALYZE` executa a query e mostra o plano real de execução, com tempos e número de linhas.
+
+```bash
+# Entrar no psql
+docker exec -it banco-blindado psql -U postgres -d ecommerce_db
+```
+
+```sql
+-- Seq Scan (sem índice): lê a tabela inteira
+EXPLAIN ANALYZE
+SELECT * FROM pedidos WHERE cliente_id = 1;
+
+-- Index Scan (com índice): vai directo ao registo
+-- (após criar o índice em 004_create_indexes.sql)
+EXPLAIN ANALYZE
+SELECT p.*, c.nome FROM pedidos p
+JOIN clientes c ON c.id = p.cliente_id
+WHERE p.cliente_id = 1;
+```
+
+Ver o ficheiro [explain_analyze_demo.sql](./explain_analyze_demo.sql) para 5 demos completos com todos os índices do projecto.
 
 ---
 
