@@ -22,11 +22,11 @@ INSERT INTO categorias (nome) VALUES
 
 -- Clientes (senha guardada com hash bcrypt via pgcrypto)
 INSERT INTO clientes (nome, email, telefone, senha_hash) VALUES
-    ('João Silva',   'joao@email.com',  '+244 923 000 001', crypt('senha123', gen_salt('bf'))),
-    ('Maria Costa',  'maria@email.com', '+244 923 000 002', crypt('senha456', gen_salt('bf'))),
-    ('Pedro Lopes',  'pedro@email.com', '+244 923 000 003', crypt('senha789', gen_salt('bf'))),
-    ('Ana Ferreira', 'ana@email.com',   '+244 923 000 004', crypt('senhaAna', gen_salt('bf'))),
-    ('Carlos Matos', 'carlos@email.com','+244 923 000 005', crypt('senhaCar', gen_salt('bf')));
+    ('João Silva Junior',   'joao.junior@email.com',  '+244 923 000 001', crypt('senha123', gen_salt('bf'))),
+    ('Maria Costa Junior',  'maria.junior@email.com', '+244 923 000 002', crypt('senha456', gen_salt('bf'))),
+    ('Pedro Lopes Junior',  'pedro.junior@email.com', '+244 923 000 003', crypt('senha789', gen_salt('bf'))),
+    ('Ana Ferreira Junior', 'ana.junior@email.com',   '+244 923 000 004', crypt('senhaAna', gen_salt('bf'))),
+    ('Carlos Matos Junior', 'carlos.junior@email.com','+244 923 000 005', crypt('senhaCar', gen_salt('bf')));
 
 -- Produtos
 INSERT INTO produtos (nome, preco, stock, categoria_id) VALUES

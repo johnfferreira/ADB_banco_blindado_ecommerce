@@ -18,10 +18,12 @@ operacao-banco-blindado/
 │   ├── 001_create_tables.sql   → Schema normalizado em 3FN
 │   ├── 002_sample_data.sql     → Dados de teste
 │   ├── 003_create_roles.sql    → Controlo de acessos (RBAC)
-│   └── 004_create_indexes.sql  → Índices para optimização
+│   ├── 004_create_indexes.sql  → Índices para optimização
+│   └── 005_import_csv.sql      → Importação de clientes via CSV (COPY)
 ├── backup/
 │   ├── backup.sh               → Script de backup automático
 │   └── restore.sh              → Script de restauro
+├── clientes.csv                → Dados brutos de clientes para importação
 ├── docker-compose.yml          → Ambiente local com PostgreSQL 16
 └── README.md
 ```
@@ -46,7 +48,26 @@ docker exec -it banco-blindado psql -U postgres -d ecommerce_db
 \dt
 ```
 
-### 3. Fazer backup manual (com Docker)
+### 3. Importar dados do CSV manualmente
+
+Se o container já estava a correr antes de adicionar o ficheiro CSV, podes importar manualmente:
+
+```bash
+# Entrar no container
+docker exec -it banco-blindado psql -U postgres -d ecommerce_db
+
+# Dentro do psql, executar:
+\COPY clientes (nome, email, telefone) FROM '/tmp/clientes.csv' DELIMITER ',' CSV HEADER;
+
+# Verificar os registos importados
+SELECT id, nome, email, telefone FROM clientes;
+```
+
+> **Nota:** O `\COPY` (com barra invertida) é o comando do cliente psql e lê o ficheiro do lado do *cliente*. O `COPY` (sem barra) lê do lado do *servidor* — ambos funcionam aqui porque o volume mapeia o ficheiro directamente.
+
+---
+
+### 4. Fazer backup manual (com Docker)
 
 ```bash
 docker exec banco-blindado pg_dump -U postgres ecommerce_db \
