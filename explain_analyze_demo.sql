@@ -3,14 +3,6 @@
 -- Arquivo: explain_analyze_demo.sql
 -- Descrição: Demonstração do EXPLAIN ANALYZE no projecto
 -- Universidade de Luanda · Administração de BD · 4º Ano
---
--- Como usar:
---   docker exec -it banco-blindado psql -U postgres -d ecommerce_db
---   \i /docker-entrypoint-initdb.d/explain_analyze_demo.sql
---
--- Ou copiar e colar cada bloco directamente no psql.
--- ============================================================
-
 
 -- ════════════════════════════════════════════════════════════
 -- O QUE É O EXPLAIN ANALYZE?
@@ -33,13 +25,6 @@
 --  │ Execution Time → tempo real de execução                 │
 --  └─────────────────────────────────────────────────────────┘
 
-
--- ════════════════════════════════════════════════════════════
--- DEMO 1: Seq Scan vs Index Scan (pedidos por cliente)
--- ════════════════════════════════════════════════════════════
-
--- ANTES do índice: Seq Scan (lê todos os pedidos para encontrar 1)
--- (desactiva temporariamente os índices para simular ausência)
 SET enable_indexscan = OFF;
 SET enable_bitmapscan = OFF;
 
@@ -49,11 +34,6 @@ FROM pedidos p
 JOIN clientes c ON c.id = p.cliente_id
 WHERE p.cliente_id = 1;
 
--- Resultado esperado:
---   Seq Scan on pedidos  (cost=... rows=... width=...)
---   actual time=...  rows=2
-
--- DEPOIS do índice: Index Scan (vai directo ao registo)
 SET enable_indexscan = ON;
 SET enable_bitmapscan = ON;
 
@@ -62,11 +42,6 @@ SELECT p.id, p.status, p.total, c.nome AS cliente
 FROM pedidos p
 JOIN clientes c ON c.id = p.cliente_id
 WHERE p.cliente_id = 1;
-
--- Resultado esperado:
---   Index Scan using idx_pedidos_cliente_id on pedidos
---   actual time=...  rows=2
-
 
 -- ════════════════════════════════════════════════════════════
 -- DEMO 2: Filtro de produtos por categoria e preço
@@ -77,11 +52,6 @@ SELECT id, nome, preco, stock
 FROM produtos
 WHERE categoria_id = 1
   AND preco < 50000.00;
-
--- Deve usar: idx_produtos_categoria_preco (índice composto)
--- Nota: com poucos dados o planner pode preferir Seq Scan
---       porque o overhead do índice só compensa com +1000 linhas.
-
 
 -- ════════════════════════════════════════════════════════════
 -- DEMO 3: Relatório de receita mensal (índice em criado_em)
@@ -96,9 +66,6 @@ FROM pedidos
 WHERE criado_em BETWEEN '2024-01-01' AND '2026-12-31'
 GROUP BY mes
 ORDER BY mes;
-
--- Deve usar: idx_pedidos_criado_em
-
 
 -- ════════════════════════════════════════════════════════════
 -- DEMO 4: JOIN complexo — relatório completo de pedidos
@@ -120,10 +87,6 @@ JOIN produtos       pr ON pr.id = ip.produto_id
 WHERE p.status = 'pago'
 ORDER BY p.id, pr.nome;
 
--- Observa o plano de JOIN: Hash Join, Nested Loop, ou Merge Join
--- O planner escolhe automaticamente o mais eficiente
-
-
 -- ════════════════════════════════════════════════════════════
 -- DEMO 5: Busca de cliente por email (coluna UNIQUE)
 -- ════════════════════════════════════════════════════════════
@@ -132,10 +95,6 @@ EXPLAIN ANALYZE
 SELECT id, nome, email
 FROM clientes
 WHERE email = 'joao@email.com';
-
--- UNIQUE cria automaticamente um índice → Index Scan garantido
--- Resultado: custo mínimo, 1 linha retornada
-
 
 -- ════════════════════════════════════════════════════════════
 -- CONSULTAR OS ÍNDICES ACTIVOS NO BANCO
